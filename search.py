@@ -184,8 +184,9 @@ def uniformCostSearch(problem):
         successors = problem.getSuccessors(current_state)
 
         for scr in successors:
-            if scr[0] not in explored and scr not in frontier.list:
-                frontier.push(scr)
+            if scr[0] not in explored:
+                scr_cost = scr[2] + current_node[2]
+                frontier.push(scr, scr_cost)
                 predecessor[scr[0]] = current_node
                 if problem.isGoalState(scr[0]):
                     return parseSolution(scr, predecessor)
