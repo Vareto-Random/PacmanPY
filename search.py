@@ -79,6 +79,7 @@ def parseSolution(node, previous):
     while previous[node[0]]:
         path.append(node[1])
         node = previous[node[0]]
+    path.reverse()
     return path
 
 
@@ -109,7 +110,7 @@ def depthFirstSearch(problem):
     start_node = (start_state, 'Stop', 0)
     predecessor[start_state] = None
     if problem.isGoalState(start_state):
-        return parseSolution( start_node, predecessor)
+        return parseSolution(start_node, predecessor)
 
     frontier.push(start_node)
     while not frontier.isEmpty():
@@ -125,19 +126,69 @@ def depthFirstSearch(problem):
                 if problem.isGoalState(scr[0]):
                     return parseSolution(scr, predecessor)
 
-    # util.raiseNotDefined()
-
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+
+    # Containers
+    frontier = Queue()
+    explored = []
+    predecessor = {}
+
+    # Checking whether start state is goal state
+    start_state = problem.getStartState()
+    start_node = (start_state, 'Stop', 0)
+    predecessor[start_state] = None
+    if problem.isGoalState(start_state):
+        return parseSolution(start_node, predecessor)
+
+    frontier.push(start_node)
+    while not frontier.isEmpty():
+        current_node = frontier.pop()
+        current_state = current_node[0]
+        explored.append(current_state)
+        successors = problem.getSuccessors(current_state)
+
+        for scr in successors:
+            if scr[0] not in explored and scr not in frontier.list:
+                frontier.push(scr)
+                predecessor[scr[0]] = current_node
+                if problem.isGoalState(scr[0]):
+                    return parseSolution(scr, predecessor)
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+
+    # Containers
+    frontier = PriorityQueue()
+    explored = []
+    predecessor = {}
+
+    # Checking whether start state is goal state
+    start_state = problem.getStartState()
+    start_node = (start_state, 'Stop', 0)
+    predecessor[start_state] = None
+    if problem.isGoalState(start_state):
+        return parseSolution(start_node, predecessor)
+
+    frontier.push(start_node, start_node[2])
+    while not frontier.isEmpty():
+        current_node = frontier.pop()
+        current_state = current_node[0]
+        explored.append(current_state)
+        successors = problem.getSuccessors(current_state)
+
+        for scr in successors:
+            if scr[0] not in explored and scr not in frontier.list:
+                frontier.push(scr)
+                predecessor[scr[0]] = current_node
+                if problem.isGoalState(scr[0]):
+                    return parseSolution(scr, predecessor)
 
 
 def nullHeuristic(state, problem=None):
