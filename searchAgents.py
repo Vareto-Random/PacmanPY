@@ -132,6 +132,7 @@ class SearchAgent(Agent):
         i = self.actionIndex
         self.actionIndex += 1
         if i < len(self.actions):
+            print self.actions[i]
             return self.actions[i]
         else:
             return Directions.STOP
@@ -346,13 +347,12 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            # For a given state, this should return a list of triples: (successor, action, stepCost)
             x, y = state
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
-            hitsWall = self.walls[nextx][nexty]
 
-            # For a given state, this should return a list of triples: (successor, action, stepCost)
-            if not hitsWall:
+            if not self.walls[nextx][nexty]:
                 successors.append(((nextx, nexty), action, 1))
 
         # Add current state to history
@@ -393,7 +393,27 @@ def cornersHeuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    cornersDistance = {}
+    path = [state]
+
+    currentState = state
+    distance = 0;
+    corners = list(corners)
+
+    while corners:
+        for corner in corners:
+            cornersDistance[corner] = abs(currentState[0] - corner[0]) + abs(
+                currentState[1] - corner[1])  # Manhattan Distance
+        closestCorner = min(cornersDistance, key=cornersDistance.get)
+        path.append(cornersDistance[closestCorner])
+        distance = distance + cornersDistance[closestCorner]
+        corners.remove(closestCorner)
+        del cornersDistance[closestCorner]
+        currentState = closestCorner
+        path.append(currentState)
+
+    print path, distance
+    return distance  # Default to trivial solution
 
 
 class AStarCornersAgent(SearchAgent):
