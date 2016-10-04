@@ -132,7 +132,6 @@ class SearchAgent(Agent):
         i = self.actionIndex
         self.actionIndex += 1
         if i < len(self.actions):
-            print self.actions[i]
             return self.actions[i]
         else:
             return Directions.STOP
@@ -397,7 +396,7 @@ def cornersHeuristic(state, problem):
     path = [state]
 
     currentState = state
-    distance = 0;
+    distance = 0
     corners = list(corners)
 
     while corners:
@@ -514,7 +513,30 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    foodList = foodGrid.asList()
+    h2 = 0
+    uneatenList = []
+    position = state[0]
+    eatenList = state[1]
+
+    problem.heuristicInfo['foodGrid'] = {}
+
+    if (len(foodList) == 0):
+        return 0
+
+    for everyfood in foodList:
+        if everyfood not in eatenList:
+            uneatenList.append(everyfood)
+
+    while len(uneatenList) > 0:
+        man_dis, food = min([util.manhattanDistance(position, food), food] for food in
+                            uneatenList)  # get the min manhattan distance between food and position
+        position = food
+        uneatenList.remove(food)
+
+        h2 = h2 + man_dis
+
+    return int(h2 / 1.145)  # this value can influence the admissiblity and the number of node
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -547,7 +569,34 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Copying BFS here
+        from util import Queue
+
+        # Containers
+        frontier = Queue()
+        explored = []
+        predecessor = {}
+
+        # Checking whether start state is goal state
+        start_state = problem.getStartState()
+        start_node = (start_state, 'Stop', 0)
+        predecessor[start_state] = None
+        if problem.isGoalState(start_state):
+            return search.parseSolution(start_node, predecessor)
+
+        frontier.push(start_node)
+        while not frontier.isEmpty():
+            current_node = frontier.pop()
+            current_state = current_node[0]
+            explored.append(current_state)
+            successors = problem.getSuccessors(current_state)
+
+            for scr in successors:
+                if scr[0] not in explored and scr not in frontier.list:
+                    frontier.push(scr)
+                    predecessor[scr[0]] = current_node
+                    if problem.isGoalState(scr[0]):
+                        return search.parseSolution(scr, predecessor)
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):

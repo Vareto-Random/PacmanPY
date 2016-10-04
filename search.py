@@ -212,7 +212,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     # Checking whether start state is goal state
     start_state = problem.getStartState()
-    start_node = (start_state, 'Stop', 0 + nullHeuristic(start_state, problem))
+    start_node = (start_state, 'Stop', 0 + heuristic(start_state, problem))
     predecessor[start_state] = None
     if problem.isGoalState(start_state):
         return parseSolution(start_node, predecessor)
@@ -226,7 +226,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
         for scr in successors:
             if scr[0] not in explored:
-                scr_cost = scr[2] + current_node[2] + nullHeuristic(current_node[2], problem)
+                scr_cost = scr[2] + current_node[2] + heuristic(current_node[0], problem)
                 frontier.push(scr, scr_cost)
                 predecessor[scr[0]] = current_node
                 if problem.isGoalState(scr[0]):
