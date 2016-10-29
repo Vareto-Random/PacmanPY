@@ -31,7 +31,7 @@ def main():
             pass
 
     if uid is None:
-        uid = raw_input('Seu número de matricula: ')
+        uid = raw_input('Seu número de matricula (Your student id): ')
 
     zipname = os.path.join(here, uid + '.zip')
 
