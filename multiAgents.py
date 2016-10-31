@@ -134,20 +134,20 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if current_state.isWin() or current_state.isLose() or depth >= self.depth:
             return self.evaluationFunction(current_state)
         values = {}
-        actions = current_state.getLegalPacmanActions()
+        actions = current_state.getLegalActions(0)
         for action in actions:
             if action != Directions.STOP:
-                new_state = current_state.generatePacmanSucessor(action)
-                new_value = 0
+                new_state = current_state.generateSuccessor(0, action)
+                new_value = self.minValue(new_state, depth, 1)
                 if values.has_key(new_value):
                     values[new_value].append(action)
                 else:
                     values[new_value] = [action]
-            best_value = max(values)
-            if depth == 0:
-                return random.choice(values[best_value])
-            else:
-                return best_value
+        best_value = max(values)
+        if depth == 0:
+            return random.choice(values[best_value])
+        else:
+            return best_value
 
     def minValue(self, current_state, depth, agent):
         if current_state.isWin() or current_state.isLose() or depth >= self.depth:
@@ -155,12 +155,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
         values = []
         actions = current_state.getLegalActions(agent)
         for action in actions:
-            new_state = current_state.generateSucessor(agent, action)
+            new_state = current_state.generateSuccessor(agent, action)
             if (agent > 0) and (agent < current_state.getNumAgents() - 1):
                 values.append(self.minValue(new_state, depth, agent + 1))
             else:
                 values.append(self.maxValue(new_state, depth + 1))
-
+        return min(values)
 
 
 
