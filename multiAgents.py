@@ -107,68 +107,82 @@ class MultiAgentSearchAgent(Agent):
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
-      Your minimax agent (question 2)
+        Your minimax agent (question 2)
     """
 
     def getAction(self, gameState):
         """
-          Returns the minimax action from the current gameState using self.depth
-          and self.evaluationFunction.
+            Returns the minimax action from the current gameState using self.depth
+            and self.evaluationFunction.
 
-          Here are some method calls that might be useful when implementing minimax.
+            Here are some method calls that might be useful when implementing minimax.
 
-          gameState.getLegalActions(agentIndex):
-            Returns a list of legal actions for an agent
-            agentIndex=0 means Pacman, ghosts are >= 1
+            gameState.getLegalActions(agentIndex):
+                Returns a list of legal actions for an agent
+                agentIndex=0 means Pacman, ghosts are >= 1
 
-          gameState.generateSuccessor(agentIndex, action):
-            Returns the successor game state after an agent takes an action
+            Directions.STOP:
+                The stop direction, which is always legal
 
-          gameState.getNumAgents():
-            Returns the total number of agents in the game
+            gameState.generateSuccessor(agentIndex, action):
+                Returns the successor game state after an agent takes an action
+
+            gameState.getNumAgents():
+                Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        actions = gameState.getLegalActions(0)
-        best_move = Directions.STOP
-        ghosts = (gameState.getNumAgents() - 1)
-        value = -float("inf")
+        # util.raiseNotDefined()
+        return self.maxValue(gameState, 0)
 
-        for action in actions:
-            new_state = gameState.generateSuccessor(0, action)
-            old_value = value
-            value = max(value, self.minValue(new_state, self.depth, ghosts))
-            if value > old_value:
-                best_move = action
-        return best_move
+    def maxValue(self, currentState, depth):
+        """
+            function VALOR-MAX(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = -INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MAX(valor, VALOR-MIN(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose() or depth >= self.depth:
+            return self.evaluationFunction(currentState)
 
-    def maxValue(self, current_state, depth):
-        if current_state.isWin() or current_state.isLose() or depth == 0:
-            return self.evaluationFunction(current_state)
-
-        actions = current_state.getLegalActions(0)
-        value = -float("inf")
-
+        values = {}
+        actions = currentState.getLegalActions(0)
         for action in actions:
             if action != Directions.STOP:
-                new_state = current_state.generateSuccessor(0, action)
-                new_value = max(value, self.minValue(new_state, depth, 1))
-        return new_value
+                newState = currentState.generateSuccessor(0, action)
+                newValue = self.minValue(newState, depth, 1)
+                if values.has_key(newValue):
+                    values[newValue].append(action)
+                else:
+                    values[newValue] = [action]
+        bestValue = max(values)
+        if depth == 0:
+            return random.choice(values[bestValue])
+        else:
+            return bestValue
 
-    def minValue(self, current_state, depth, agent):
-        if current_state.isWin() or current_state.isLose() or depth == 0:
-            return self.evaluationFunction(current_state)
+    def minValue(self, currentState, depth, agent):
+        """
+            function VALOR-MIN(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = +INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MIN(valor, VALOR-MAX(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose():
+            return self.evaluationFunction(currentState)
 
-        actions = current_state.getLegalActions(agent)
-        ghosts = (current_state.getNumAgents() - 1)
-        value = float("inf")
-
+        values = []
+        actions = currentState.getLegalActions(agent)
         for action in actions:
-            new_state = current_state.generateSuccessor(agent, action)
-            if agent == ghosts:
-                new_value = min(value, self.maxValue(new_state, depth - 1))
+            newState = currentState.generateSuccessor(agent, action)
+            if agent > 0 and agent < currentState.getNumAgents() - 1:
+                values.append(self.minValue(newState, depth, agent + 1))
             else:
-                new_value = min(value, self.minValue(new_state, depth, agent + 1))
-        return new_value
+                values.append(self.maxValue(newState, depth + 1))
+        return min(values)
 
 
 
