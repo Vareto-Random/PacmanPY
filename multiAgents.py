@@ -18,6 +18,7 @@ import random, util
 
 from game import Agent
 
+
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -27,7 +28,6 @@ class ReflexAgent(Agent):
       it in any way you see fit, so long as you don't touch our method
       headers.
     """
-
 
     def getAction(self, gameState):
         """
@@ -75,6 +75,7 @@ class ReflexAgent(Agent):
 
         return successorGameState.getScore()
 
+
 def scoreEvaluationFunction(currentGameState):
     """
       This default evaluation function just returns the score of the state.
@@ -84,6 +85,7 @@ def scoreEvaluationFunction(currentGameState):
       (not reflex agents).
     """
     return currentGameState.getScore()
+
 
 class MultiAgentSearchAgent(Agent):
     """
@@ -104,6 +106,7 @@ class MultiAgentSearchAgent(Agent):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -185,7 +188,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return min(values)
 
 
-
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
@@ -196,7 +198,61 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        alpha = -999999
+        beta = 999999
+        return self.maxValue(gameState, 0)
+
+    def maxValue(self, currentState, depth):
+        """
+            function VALOR-MAX(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = -INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MAX(valor, VALOR-MIN(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose() or depth >= self.depth:
+            return self.evaluationFunction(currentState)
+
+        values = {}
+        actions = currentState.getLegalActions(0)
+        for action in actions:
+            if action != Directions.STOP:
+                newState = currentState.generateSuccessor(0, action)
+                newValue = self.minValue(newState, depth, 1)
+                if values.has_key(newValue):
+                    values[newValue].append(action)
+                else:
+                    values[newValue] = [action]
+        bestValue = max(values)
+        if depth == 0:
+            return random.choice(values[bestValue])
+        else:
+            return bestValue
+
+    def minValue(self, currentState, depth, agent):
+        """
+            function VALOR-MIN(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = +INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MIN(valor, VALOR-MAX(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose():
+            return self.evaluationFunction(currentState)
+
+        values = []
+        actions = currentState.getLegalActions(agent)
+        for action in actions:
+            newState = currentState.generateSuccessor(agent, action)
+            if agent > 0 and agent < currentState.getNumAgents() - 1:
+                values.append(self.minValue(newState, depth, agent + 1))
+            else:
+                values.append(self.maxValue(newState, depth + 1))
+        return min(values)
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
