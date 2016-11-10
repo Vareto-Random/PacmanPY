@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -128,40 +128,47 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        self.maxValue(gameState, 0)
+        actions = gameState.getLegalActions(0)
+        best_move = Directions.STOP
+        ghosts = (gameState.getNumAgents() - 1)
+        value = -float("inf")
+
+        for action in actions:
+            new_state = gameState.generateSuccessor(0, action)
+            old_value = value
+            value = max(value, self.minValue(new_state, self.depth, ghosts))
+            if value > old_value:
+                best_move = action
+        return best_move
 
     def maxValue(self, current_state, depth):
-        if current_state.isWin() or current_state.isLose() or depth >= self.depth:
+        if current_state.isWin() or current_state.isLose() or depth == 0:
             return self.evaluationFunction(current_state)
-        values = {}
+
         actions = current_state.getLegalActions(0)
+        value = -float("inf")
+
         for action in actions:
             if action != Directions.STOP:
                 new_state = current_state.generateSuccessor(0, action)
-                new_value = self.minValue(new_state, depth, 1)
-                if values.has_key(new_value):
-                    values[new_value].append(action)
-                else:
-                    values[new_value] = [action]
-        best_value = max(values)
-        if depth == 0:
-            return random.choice(values[best_value])
-        else:
-            return best_value
+                new_value = max(value, self.minValue(new_state, depth, 1))
+        return new_value
 
     def minValue(self, current_state, depth, agent):
-        if current_state.isWin() or current_state.isLose() or depth >= self.depth:
+        if current_state.isWin() or current_state.isLose() or depth == 0:
             return self.evaluationFunction(current_state)
-        values = []
+
         actions = current_state.getLegalActions(agent)
+        ghosts = (current_state.getNumAgents() - 1)
+        value = float("inf")
+
         for action in actions:
             new_state = current_state.generateSuccessor(agent, action)
-            if (agent > 0) and (agent < current_state.getNumAgents() - 1):
-                values.append(self.minValue(new_state, depth, agent + 1))
+            if agent == ghosts:
+                new_value = min(value, self.maxValue(new_state, depth - 1))
             else:
-                values.append(self.maxValue(new_state, depth + 1))
-        return min(values)
-
+                new_value = min(value, self.minValue(new_state, depth, agent + 1))
+        return new_value
 
 
 
