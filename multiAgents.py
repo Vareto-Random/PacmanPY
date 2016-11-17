@@ -239,7 +239,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 else:
                     values[newValue] = [action]
                 bestValue = max(values)
-                if bestValue >= beta:
+                if bestValue > beta:
                     return bestValue
                 else:
                     alpha = max(bestValue, alpha)
@@ -269,7 +269,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 newValue = self.maxValue(newState, alpha, beta, depth - 1)
             values.append(newValue)
             bestValue = min(values)
-            if bestValue <= alpha:
+            if bestValue < alpha:
                 return bestValue
             else:
                 beta = min(bestValue, beta)
