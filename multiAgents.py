@@ -327,6 +327,8 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 valor = +INFINITO
                 para acao,nEstado em SUCESSORES(estado) faca
                     valor = MIN(valor, VALOR-MAX(nEstado))
+
+            aqui o objetivo e colocar o mesmo valor para cada action, assim Ghosts escolhem aleatoriamente
         """
         if currentState.isWin() or currentState.isLose() or depth <= 0:
             return self.evaluationFunction(currentState)
@@ -348,7 +350,38 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    currentPos = currentGameState.getPacmanPosition()
+    currentFood = currentGameState.getFood()
+    currentGhostStates = currentGameState.getGhostStates()
+
+    return currentGameState.getScore() + 5.0 / getClosestGhost(currentPos, currentGhostStates) + 10.0 / getDistanceToFood(currentPos, currentFood)
+
+def getClosestGhost(currentPos, ghostStates):
+    distanceToGhosts = []
+    for state in ghostStates:
+        ghostPos = state.getPosition()
+        distance = manhattanDistance(currentPos, ghostPos)
+        distanceToGhosts.append(distance)
+    if distanceToGhosts:
+        closest = min(distanceToGhosts)
+        if closest != 0:
+            return closest
+    return 1
+
+def getDistanceToFood(currentPos, foodMenu):
+    foods = foodMenu.asList()
+    distanceToFoods = []
+    for food in foods:
+        distance = manhattanDistance(currentPos, food)
+        distanceToFoods.append(distance)
+    if distanceToFoods:
+        avgDistance = sum(distanceToFoods) / float(len(distanceToFoods))
+        if sum(distanceToFoods) != 0:
+            return avgDistance
+    return 1
+
+
 
 # Abbreviation
 better = betterEvaluationFunction
