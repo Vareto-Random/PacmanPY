@@ -179,7 +179,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         actions = currentState.getLegalActions(agent)
         for action in actions:
             newState = currentState.generateSuccessor(agent, action)
-            if agent > 0 and agent < currentState.getNumAgents() - 1:
+            if (agent > 0) and (agent < currentState.getNumAgents() - 1):
                 values.append(self.minValue(newState, depth, agent + 1))
             else:
                 values.append(self.maxValue(newState, depth - 1))
@@ -289,7 +289,56 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        return self.maxValue(gameState, self.depth)
+
+    def maxValue(self, currentState, depth):
+        """
+            function VALOR-MAX(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = -INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MAX(valor, VALOR-MIN(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose() or depth <= 0:
+            return self.evaluationFunction(currentState)
+        values = {}
+        actions = currentState.getLegalActions(0)
+        for action in actions:
+            if action != Directions.STOP:
+                newState = currentState.generateSuccessor(0, action)
+                newValue = self.minValue(newState, depth, 1)
+                if values.has_key(newValue):
+                    values[newValue].append(action)
+                else:
+                    values[newValue] = [action]
+        bestValue = max(values)
+        if depth == self.depth:
+            return random.choice(values[bestValue])
+        else:
+            return max(values)
+
+    def minValue(self, currentState, depth, agent):
+        """
+            function VALOR-MIN(estado)
+                se TESTE-TERMINAL(estado)
+                    retorna UTILIDADE(estado)
+                valor = +INFINITO
+                para acao,nEstado em SUCESSORES(estado) faca
+                    valor = MIN(valor, VALOR-MAX(nEstado))
+        """
+        if currentState.isWin() or currentState.isLose() or depth <= 0:
+            return self.evaluationFunction(currentState)
+        values = []
+        actions = currentState.getLegalActions(agent)
+        for action in actions:
+            newState = currentState.generateSuccessor(agent, action)
+            if (agent > 0) and (agent < currentState.getNumAgents() - 1):
+                values.append(self.minValue(newState, depth, agent + 1))
+            else:
+                values.append(self.maxValue(newState, depth - 1))
+        return sum(values) / len(actions)
 
 def betterEvaluationFunction(currentGameState):
     """
