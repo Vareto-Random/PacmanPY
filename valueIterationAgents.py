@@ -45,7 +45,21 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        self.iterateValues(mdp,iterations)
 
+    def iterateValues(self, mdp, iterations):
+      counter = 0
+      while counter < iterations:
+        values = {}
+        for state in mdp.getStates():
+          if mdp.isTerminal(state):
+            values[state] = 0
+          else:
+            tempList = [self.getQValue(state,action) for action in mdp.getPossibleActions(state)]
+            values[state] = max(tempList)
+        for state in values:
+          self.values[state] = values[state]
+        counter += 1
 
     def getValue(self, state):
         """
