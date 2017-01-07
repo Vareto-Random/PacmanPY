@@ -76,7 +76,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         statePros = self.mdp.getTransitionStatesAndProbs(state, action)
         values = []
         for (nextState,transPro) in statePros:
-          values.append(transPro * (self.mdp.getReward(state, action, nextState) + self.discount * self.getValue(nextState))
+          values.append(transPro * (self.mdp.getReward(state, action, nextState) + self.discount * self.getValue(nextState)))
         return sum(values)
 
     def computeActionFromValues(self, state):
