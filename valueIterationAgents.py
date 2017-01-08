@@ -16,6 +16,7 @@ import mdp, util
 
 from learningAgents import ValueEstimationAgent
 
+
 class ValueIterationAgent(ValueEstimationAgent):
     """
         * Please read learningAgents.py before reading this.*
@@ -25,7 +26,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
-    def __init__(self, mdp, discount = 0.9, iterations = 100):
+
+    def __init__(self, mdp, discount=0.9, iterations=100):
         """
           Your value iteration agent should take an mdp on
           construction, run the indicated number of iterations
@@ -41,25 +43,25 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.mdp = mdp
         self.discount = discount
         self.iterations = iterations
-        self.values = util.Counter() # A Counter is a dict with default 0
+        self.values = util.Counter()  # A Counter is a dict with default 0
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        self.iterateValues(mdp,iterations)
+        self.iterateValues(mdp, iterations)
 
     def iterateValues(self, mdp, iterations):
-      counter = 0
-      while counter < iterations:
-        values = {}
-        for state in mdp.getStates():
-          if mdp.isTerminal(state):
-            values[state] = 0
-          else:
-            valuesList = [self.getQValue(state,action) for action in mdp.getPossibleActions(state)]
-            values[state] = max(valuesList)
-        for state in values:
-          self.values[state] = values[state]
-        counter += 1
+        counter = 0
+        while counter < iterations:
+            values = {}
+            for state in mdp.getStates():
+                if mdp.isTerminal(state):
+                    values[state] = 0
+                else:
+                    valuesList = [self.getQValue(state, action) for action in mdp.getPossibleActions(state)]
+                    values[state] = max(valuesList)
+            for state in values:
+                self.values[state] = values[state]
+            counter += 1
 
     def getValue(self, state):
         """
@@ -75,8 +77,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         statePros = self.mdp.getTransitionStatesAndProbs(state, action)
         values = []
-        for (nextState,transPro) in statePros:
-          values.append(transPro * (self.mdp.getReward(state, action, nextState) + self.discount * self.getValue(nextState)))
+        for (nextState, transPro) in statePros:
+            values.append(
+                transPro * (self.mdp.getReward(state, action, nextState) + self.discount * self.getValue(nextState)))
         return sum(values)
 
     def computeActionFromValues(self, state):
@@ -91,10 +94,10 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         actions = self.mdp.getPossibleActions(state)
         if len(actions) <= 0:
-          return None
+            return None
         else:
-          actionList = [(self.getQValue(state,action),action) for action in actions]
-          return max(actionList)[1]
+            actionList = [(self.getQValue(state, action), action) for action in actions]
+            return max(actionList)[1]
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
